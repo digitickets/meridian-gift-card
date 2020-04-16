@@ -60,4 +60,24 @@ class MeridianGiftCardGateway extends AbstractVoucherGateway
     {
         throw new \RuntimeException('Cannot unredeem (credit) a Meridian Gift Card');
     }
+
+    public function setIpAddress($value)
+    {
+        $this->setParameter('ipAddress', $value);
+    }
+
+    public function getIpAddress()
+    {
+        return $this->getParameter('ipAddress');
+    }
+
+    public function setPort($value)
+    {
+        $this->setParameter('port', $value);
+    }
+
+    public function getPort()
+    {
+        return $this->getParameter('port');
+    }
 }

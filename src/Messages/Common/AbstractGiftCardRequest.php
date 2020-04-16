@@ -6,35 +6,57 @@ use Omnipay\Common\Message\AbstractRequest;
 
 abstract class AbstractGiftCardRequest extends AbstractRequest
 {
-    public function setGateway($value)
-    {
-        $this->setParameter('gateway', $value);
-    }
+    abstract protected function getMessageParams(): array;
 
     public function getGateway()
     {
         return $this->getParameter('gateway');
     }
 
+    public function setGateway($value)
+    {
+        $this->setParameter('gateway', $value);
+    }
+
+    /**
+     * Sets the gift card reference. Unfortunately, to be consistent with other similar drivers, the parameter is called
+     * "voucherCode", hence the names of these methods.
+     *
+     * @param $giftCardReference
+     *
+     * @return AbstractRequest
+     */
+    public function setVoucherCode($giftCardReference)
+    {
+        return $this->setParameter('giftCardReference', $giftCardReference);
+    }
+
+    public function getVoucherCode()
+    {
+        return $this->getParameter('giftCardReference');
+    }
+
+    /**
+     * This is just a wrapper round "getVoucherCode()".
+     * @return mixed
+     */
+    public function getGiftCardReference()
+    {
+        return $this->getVoucherCode();
+    }
+
     public function getData()
     {
-        // @TODO: Some of this will need to be split off into the subclasses.
-        $result = implode(
-            '&',
-            [
-                'Type=G',
-                'Reference=92298057',
-                'PinCode=',
-                'MerchantID=merwebclient',
-            ]
-        );
+        // @TODO: Inline this when finished.
+        $result = implode('&', $this->getMessageParams());
+
         return $result;
     }
 
     protected function getEndpoint()
     {
-        // @TODO: The IP and port will come from the parameters; the "GetBalance" will come from the subclass.
-        return 'http://185.32.152.209:9099/service.asmx/GetBalance';
+        // @TODO: "GetBalance" will come from the subclass.
+        return sprintf('http://%s:%d/service.asmx/GetBalance', $this->getGateway()->getIpAddress(), $this->getGateway()->getPort());
     }
 
     protected function getHeaders()
@@ -53,21 +75,28 @@ abstract class AbstractGiftCardRequest extends AbstractRequest
                 ->post($this->getEndpoint(), $this->getHeaders(), $data)
                 ->send()
                 ->getBody();
+
+            // The response is a bit weird, and SimpleXMLElement doesn't seem to be able to parse it, so we extract the
+            // middle bit (the "Meridian" node) out and go from there. And yes, preg_match looks for the parent tag,
+            // which seems to disappear when SimpleXMLElement parses it (but it crashes if you pass in the "Meridian" node).
+            $matches = [];
+            preg_match('/<diffgr:diffgram.*<\/diffgr:diffgram>/s', $responseXml, $matches);
+            if (is_array($matches) && count($matches) > 0) {
+                $simpleCoreXml = new \SimpleXMLElement($matches[0]);
+                $responseObj = json_decode(json_encode($simpleCoreXml));
+            } else {
+                throw new \RuntimeException('Unexpected response format');
+            }
         } catch (\Exception $e) {
-            // @TODO: We need to create an XML object with the error message inside.
-            // @TODO: Using a temporary copy from the Tesco driver for now.
-            $errorXml = <<<EOT
-<?xml version="1.0" encoding="utf-16"?>
-<Error message="{$e->getMessage()}"></Error>
-EOT;
-            $responseXml = simplexml_load_string(mb_convert_encoding($errorXml, 'UTF-16'));
+            // Build a small stdClass containing the error message.
+            $responseObj = json_decode(sprintf('{"error":{"message":"%s"}}', $e->getMessage()));
         }
 
         // Send all the information to any listeners.
         foreach ($this->getGateway()->getListeners() as $listener) {
-            $listener->update($this->getListenerAction(), $responseXml);
+            $listener->update($this->getListenerAction(), $responseObj);
         }
 
-        return $this->response = $this->buildResponse($this, $responseXml);
+        return $this->response = $this->buildResponse($this, $responseObj);
     }
 }

@@ -3,16 +3,20 @@
 namespace DigiTickets\MeridianGiftCard\Messages\GiftCard;
 
 use DigiTickets\MeridianGiftCard\Messages\Common\AbstractGiftCardRequest;
+use Omnipay\Common\Message\RequestInterface;
 
 class ValidateRequest extends AbstractGiftCardRequest
 {
-    /**
-     * @return AbstractMessage
-     */
-    protected function buildMessage()
+    protected function getMessageParams(): array
     {
-// @TODO: We need to use the term "gift card reference" instead of "voucher code" everywhere.
-        return new ValidateMessage($this->getVoucherCode());
+        $this->validate('giftCardReference');
+
+        return [
+            'Type=G',
+            'Reference='.$this->getGiftCardReference(),
+            'PinCode=',
+            'MerchantID=merwebclient',
+        ];
     }
 
     /**
