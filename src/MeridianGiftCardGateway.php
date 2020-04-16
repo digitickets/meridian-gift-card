@@ -1,6 +1,6 @@
 <?php
 
-namespace DigiTickets\DigiTicketsVoucher;
+namespace DigiTickets\MeridianGiftCard;
 
 use DigiTickets\OmnipayAbstractVoucher\AbstractVoucherGateway;
 use DigiTickets\DigiTicketsVoucher\Messages\Omnipay\AuthorizeRequest;
