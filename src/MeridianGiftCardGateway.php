@@ -3,14 +3,12 @@
 namespace DigiTickets\MeridianGiftCard;
 
 use DigiTickets\OmnipayAbstractVoucher\AbstractVoucherGateway;
-use DigiTickets\DigiTicketsVoucher\Messages\Omnipay\AuthorizeRequest;
-use DigiTickets\DigiTicketsVoucher\Messages\Omnipay\PurchaseRequest;
-use DigiTickets\DigiTicketsVoucher\Messages\Omnipay\RefundRequest;
-use DigiTickets\DigiTicketsVoucher\Messages\Voucher\RedeemRequest;
-use DigiTickets\DigiTicketsVoucher\Messages\Voucher\ValidateRequest;
-use DigiTickets\DigiTicketsVoucher\Messages\Voucher\UnredeemRequest;
+use DigiTickets\MeridianGiftCard\Messages\Omnipay\AuthorizeRequest;
+use DigiTickets\MeridianGiftCard\Messages\Omnipay\PurchaseRequest;
+use DigiTickets\MeridianGiftCard\Messages\GiftCard\RedeemRequest;
+use DigiTickets\MeridianGiftCard\Messages\GiftCard\ValidateRequest;
+use Omnipay\Common\Message\AbstractRequest;
 
-// @TODO: This needs to be updated for Meridian Gift Cards.
 class MeridianGiftCardGateway extends AbstractVoucherGateway
 {
     public function getName()
@@ -36,11 +34,6 @@ class MeridianGiftCardGateway extends AbstractVoucherGateway
         return $this->createRequest(PurchaseRequest::class, $parameters);
     }
 
-    public function refund(array $parameters = array())
-    {
-        return $this->createRequest(RefundRequest::class, $parameters);
-    }
-
     // These are the methods that the DigiTickets voucher interface demands.
     /**
      * @param array $parameters
@@ -48,8 +41,6 @@ class MeridianGiftCardGateway extends AbstractVoucherGateway
      */
     public function validate(array $parameters = array())
     {
-error_log('[Driver] This is validate');
-error_log('[Driver] Class name is: '.ValidateRequest::class);
         return $this->createRequest(ValidateRequest::class, $parameters);
     }
 
@@ -64,22 +55,9 @@ error_log('[Driver] Class name is: '.ValidateRequest::class);
 
     /**
      * @param array $parameters
-     * @return AbstractRequest
      */
     public function unredeem(array $parameters = array())
     {
-        return $this->createRequest(UnredeemRequest::class, $parameters);
-    }
-
-    public function setVirtualApi($value)
-    {
-error_log('[Driver] setVirtualApi is being called');
-        $this->setParameter('virtualApi', $value);
-    }
-
-    public function getVirtualApi()
-    {
-error_log('[Driver] getVirtualApi is being called');
-        return $this->getParameter('virtualApi');
+        throw new \RuntimeException('Cannot unredeem (credit) a Meridian Gift Card');
     }
 }
