@@ -49,9 +49,7 @@ abstract class AbstractGiftCardRequest extends AbstractRequest
 
     public function getData()
     {
-        // @TODO: Inline this when finished.
-        $result = implode('&', $this->getMessageParams());
-        return $result;
+        return implode('&', $this->getMessageParams());
     }
 
     protected function getEndpoint()

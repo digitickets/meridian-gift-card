@@ -9,6 +9,8 @@ class RedeemRequest extends AbstractGiftCardRequest
 {
     protected function getMessageParams(): array
     {
+        $this->validate('giftCardReference');
+
         return [
             'Type=G',
             'Reference='.$this->getGiftCardReference(),
