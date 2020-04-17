@@ -8,6 +8,8 @@ abstract class AbstractGiftCardRequest extends AbstractRequest
 {
     abstract protected function getMessageParams(): array;
 
+    abstract protected function getEndpointAction(): string;
+
     public function getGateway()
     {
         return $this->getParameter('gateway');
@@ -49,20 +51,23 @@ abstract class AbstractGiftCardRequest extends AbstractRequest
     {
         // @TODO: Inline this when finished.
         $result = implode('&', $this->getMessageParams());
-
         return $result;
     }
 
     protected function getEndpoint()
     {
-        // @TODO: "GetBalance" will come from the subclass.
-        return sprintf('http://%s:%d/service.asmx/GetBalance', $this->getGateway()->getIpAddress(), $this->getGateway()->getPort());
+        return sprintf(
+            'http://%s:%d/service.asmx/%s',
+            $this->getGateway()->getIpAddress(),
+            $this->getGateway()->getPort(),
+            $this->getEndpointAction()
+        );
     }
 
     protected function getHeaders()
     {
         return [
-//            'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', // @TODO: Work out what this should be.
+            'Accept' => 'application/xml',
             'Content-Type' => 'application/x-www-form-urlencoded',
         ];
     }

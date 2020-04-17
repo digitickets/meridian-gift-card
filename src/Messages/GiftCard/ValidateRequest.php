@@ -19,6 +19,11 @@ class ValidateRequest extends AbstractGiftCardRequest
         ];
     }
 
+    protected function getEndpointAction(): string
+    {
+        return 'GetBalance';
+    }
+
     /**
      * @param RequestInterface $request
      * @param mixed $response
