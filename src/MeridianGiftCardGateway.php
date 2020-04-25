@@ -54,6 +54,8 @@ class MeridianGiftCardGateway extends AbstractVoucherGateway
     }
 
     /**
+     * Meridian Gift Cards do not support refunds/credits, so throw an exception if anyone tries.
+     *
      * @param array $parameters
      */
     public function unredeem(array $parameters = array())
