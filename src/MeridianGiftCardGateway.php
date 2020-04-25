@@ -82,4 +82,14 @@ class MeridianGiftCardGateway extends AbstractVoucherGateway
     {
         return $this->getParameter('port');
     }
+
+    public function setMerchantId($value)
+    {
+        $this->setParameter('merchantId', $value);
+    }
+
+    public function getMerchantId()
+    {
+        return $this->getParameter('merchantId');
+    }
 }

@@ -17,7 +17,7 @@ class ValidateRequest extends AbstractGiftCardRequest
             'Type=G',
             'Reference='.$this->getGiftCardReference(),
             'PinCode=',
-            'MerchantID=merwebclient', // @TODO: This should come from the config
+            'MerchantID='.$this->getGateway()->getMerchantId(),
         ];
     }
 

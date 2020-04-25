@@ -9,7 +9,7 @@ class RedeemRequest extends AbstractGiftCardRequest
 {
     protected function getMessageParams(): array
     {
-        $this->validate('giftCardReference');
+        $this->validate('giftCardReference', 'transactionId');
 
         // The type is hard-coded to "G" for "Gift Card".
         // The PIN code must be empty.
@@ -18,7 +18,7 @@ class RedeemRequest extends AbstractGiftCardRequest
             'Reference='.$this->getGiftCardReference(),
             'SaleReference='.$this->getTransactionId(),
             'UsageValue='.$this->getAmount(),
-            'MerchantID=merwebclient', // @TODO: This should come from the config
+            'MerchantID='.$this->getGateway()->getMerchantId(),
             'PinCode=',
         ];
     }
